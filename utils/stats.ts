@@ -65,7 +65,7 @@ export function insights(data: Snapshot) {
     };
   };
   const products = new Map<string, RateRow>();
-  const ages: RateRow[] = ["0–1 days", "2–3 days", "4–7 days", "8+ days"].map(
+  const ages: RateRow[] = ["0–1 天", "2–3 天", "4–7 天", "8 天及以上"].map(
     (key) => ({ key, success: 0, total: 0 }),
   );
   let excluded = 0;

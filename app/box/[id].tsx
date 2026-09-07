@@ -1,3 +1,4 @@
+import { errorMessage } from "../../utils/errors";
 import { useRef, useState } from "react";
 import { Alert, Switch, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -36,10 +37,7 @@ export default function EditBox() {
       await data.refresh();
       router.back();
     } catch (e) {
-      Alert.alert(
-        "Couldn’t save",
-        e instanceof Error ? e.message : "Please try again.",
-      );
+      Alert.alert("保存失败", errorMessage(e, "请重试。"), [{ text: "确定" }]);
     } finally {
       saving.current = false;
       setBusy(false);
@@ -48,49 +46,49 @@ export default function EditBox() {
   if (!box)
     return (
       <Page>
-        <Txt>Box not found.</Txt>
+        <Txt>未找到猫砂盆。</Txt>
       </Page>
     );
   return (
     <Page>
-      <Field label="Name" value={name} onChangeText={setName} />
+      <Field label="名称" value={name} onChangeText={setName} />
       <Field
-        label="Length (cm) · optional"
+        label="长（厘米）· 选填"
         value={length}
         onChangeText={setLength}
         keyboardType="decimal-pad"
       />
       <Field
-        label="Width (cm) · optional"
+        label="宽（厘米）· 选填"
         value={width}
         onChangeText={setWidth}
         keyboardType="decimal-pad"
       />
       <Field
-        label="Height (cm) · optional"
+        label="高（厘米）· 选填"
         value={height}
         onChangeText={setHeight}
         keyboardType="decimal-pad"
       />
       <Field
-        label="Notes · optional"
+        label="备注 · 选填"
         value={notes}
         onChangeText={setNotes}
         multiline
       />
       <View style={s.row}>
         <View style={{ flex: 1 }}>
-          <Txt>Active</Txt>
-          <Txt muted>Show this box when recording.</Txt>
+          <Txt>启用</Txt>
+          <Txt muted>记录时显示此猫砂盆。</Txt>
         </View>
         <Switch
-          accessibilityLabel="Box active"
+          accessibilityLabel="启用此猫砂盆"
           value={active}
           onValueChange={setActive}
         />
       </View>
       <Button
-        title={busy ? "Saving…" : "Save box"}
+        title={busy ? "正在保存…" : "保存猫砂盆"}
         primary
         disabled={busy}
         onPress={() => void save()}

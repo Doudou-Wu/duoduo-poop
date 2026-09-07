@@ -17,13 +17,14 @@ export function DateField({
       <Txt muted>{label}</Txt>
       <View style={s.wrap}>
         <Button
-          title={value.toLocaleDateString()}
+          title={value.toLocaleDateString("zh-CN")}
           onPress={() => setMode(mode === "date" ? null : "date")}
         />
         <Button
-          title={value.toLocaleTimeString(undefined, {
+          title={value.toLocaleTimeString("zh-CN", {
             hour: "2-digit",
             minute: "2-digit",
+            hour12: false,
           })}
           onPress={() => setMode(mode === "time" ? null : "time")}
         />
@@ -32,6 +33,10 @@ export function DateField({
         <>
           <DateTimePicker
             value={value}
+            locale="zh-CN"
+            is24Hour
+            positiveButton={{ label: "确定" }}
+            negativeButton={{ label: "取消" }}
             mode={mode}
             maximumDate={new Date()}
             display={Platform.OS === "ios" ? "spinner" : "default"}
@@ -41,7 +46,7 @@ export function DateField({
             }}
           />
           {Platform.OS === "ios" && (
-            <Button title="Done" onPress={() => setMode(null)} />
+            <Button title="完成" onPress={() => setMode(null)} />
           )}
         </>
       )}

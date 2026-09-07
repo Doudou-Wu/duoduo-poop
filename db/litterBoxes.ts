@@ -7,10 +7,10 @@ export async function listBoxes(db: SQLiteDatabase): Promise<LitterBox[]> {
   return rows.map((row) => ({ ...row, active: !!row.active }));
 }
 export async function updateBox(db: SQLiteDatabase, box: LitterBox) {
-  if (!box.name.trim()) throw new Error("Please enter a box name.");
+  if (!box.name.trim()) throw new Error("请输入猫砂盆名称。");
   for (const value of [box.widthCm, box.lengthCm, box.heightCm]) {
     if (value !== null && (!Number.isFinite(value) || value <= 0))
-      throw new Error("Dimensions must be positive numbers.");
+      throw new Error("尺寸必须大于零。");
   }
   await db.runAsync(
     "UPDATE litter_boxes SET name=?,widthCm=?,lengthCm=?,heightCm=?,active=?,notes=?,updatedAt=? WHERE id=?",

@@ -4,12 +4,12 @@ import type { Event, EventType, LitterBox } from "../types/models";
 import { Card, Txt, s } from "./ui";
 import { eventTime, formatTime } from "../utils/dates";
 export const labels: Record<EventType, string> = {
-  pee: "Pee",
-  poop: "Poop",
-  scoop: "Scooped",
-  wash_box: "Washed box",
-  add_litter: "Added litter",
-  replace_litter: "Replaced litter",
+  pee: "尿尿",
+  poop: "便便",
+  scoop: "铲砂",
+  wash_box: "清洗猫砂盆",
+  add_litter: "添加猫砂",
+  replace_litter: "全部换砂",
 };
 export const icons: Record<EventType, string> = {
   pee: "💧",
@@ -21,12 +21,12 @@ export const icons: Record<EventType, string> = {
 };
 export function locationName(event: Event, boxes: LitterBox[]) {
   return event.litterBoxId
-    ? (boxes.find((b) => b.id === event.litterBoxId)?.name ?? "Unknown box")
+    ? (boxes.find((b) => b.id === event.litterBoxId)?.name ?? "未知猫砂盆")
     : {
-        floor: "Floor",
-        bathtub: "Bathtub",
-        other: "Other",
-        litter_box: "Litter box",
+        floor: "地板",
+        bathtub: "浴缸",
+        other: "其他",
+        litter_box: "猫砂盆",
       }[event.locationType ?? "other"];
 }
 export function EventCard({
@@ -39,7 +39,7 @@ export function EventCard({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${labels[event.type]}, ${locationName(event, boxes)}, ${formatTime(eventTime(event))}. View details`}
+      accessibilityLabel={`${labels[event.type]}, ${locationName(event, boxes)}, ${formatTime(eventTime(event))}。查看详情`}
       onPress={() =>
         router.push({ pathname: "/event/[id]", params: { id: event.id } })
       }
@@ -53,7 +53,7 @@ export function EventCard({
             </Txt>
             <Txt muted>
               {formatTime(eventTime(event))}
-              {event.timeIsApproximate ? " · Discovered" : ""}
+              {event.timeIsApproximate ? " · 发现时间" : ""}
             </Txt>
           </View>
           <Txt muted>›</Txt>

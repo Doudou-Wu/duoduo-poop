@@ -15,10 +15,10 @@ export default function Layout() {
       }}
     >
       {[
-        { name: "index", title: "Home", icon: "⌂" },
-        { name: "history", title: "History", icon: "≡" },
-        { name: "boxes", title: "Boxes", icon: "□" },
-        { name: "insights", title: "Insights", icon: "◴" },
+        { name: "index", title: "首页", icon: "⌂" },
+        { name: "history", title: "历史", icon: "≡" },
+        { name: "boxes", title: "猫砂盆", icon: "□" },
+        { name: "insights", title: "统计", icon: "◴" },
       ].map((t) => (
         <Tabs.Screen
           key={t.name}

@@ -44,7 +44,7 @@ export async function seedDefaults(db: SQLiteDatabase, uuid: () => string) {
   await db.runAsync(
     "INSERT INTO litter_boxes VALUES (?,?,?,?,?,?,?,?,?)",
     uuid(),
-    "Box 1",
+    "小猫砂盆",
     null,
     null,
     null,
@@ -56,7 +56,7 @@ export async function seedDefaults(db: SQLiteDatabase, uuid: () => string) {
   await db.runAsync(
     "INSERT INTO litter_boxes VALUES (?,?,?,?,?,?,?,?,?)",
     uuid(),
-    "IKEA SAMLA",
+    "大猫砂盆",
     56,
     78,
     18,
@@ -80,11 +80,33 @@ export async function migrate(db: SQLiteDatabase, uuid: () => string) {
       "PRAGMA user_version",
     );
     if ((row?.user_version ?? 0) > 1)
-      throw new Error("This database needs a newer version of Duoduo Poop.");
+      throw new Error("请升级多多便便后再打开此数据库。");
     if (!row?.user_version) {
       await tx.execAsync(schemaV1);
       await tx.execAsync("PRAGMA user_version = 1;");
     }
     await seedDefaults(tx, uuid);
+    if (
+      !(await tx.getFirstAsync(
+        "SELECT key FROM app_settings WHERE key = ?",
+        "chinese_box_names_v1",
+      ))
+    ) {
+      await tx.runAsync(
+        "UPDATE litter_boxes SET name = ? WHERE name = ?",
+        "小猫砂盆",
+        "Box 1",
+      );
+      await tx.runAsync(
+        "UPDATE litter_boxes SET name = ? WHERE name = ?",
+        "大猫砂盆",
+        "IKEA SAMLA",
+      );
+      await tx.runAsync(
+        "INSERT INTO app_settings VALUES (?, ?)",
+        "chinese_box_names_v1",
+        "true",
+      );
+    }
   });
 }

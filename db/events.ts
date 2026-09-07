@@ -19,46 +19,45 @@ export async function listEvents(db: SQLiteDatabase): Promise<Event[]> {
   }));
 }
 export function validateEvent(input: EventInput, litter?: LitterInput) {
-  if (!eventTypes.includes(input.type))
-    throw new Error("Choose an event type.");
+  if (!eventTypes.includes(input.type)) throw new Error("请选择事件类型。");
   const elimination = input.type === "pee" || input.type === "poop";
   if (
     !input.locationType ||
     !["litter_box", "floor", "bathtub", "other"].includes(input.locationType)
   )
-    throw new Error("Choose a location.");
+    throw new Error("请选择位置。");
   if (
     input.locationType === "litter_box"
       ? !input.litterBoxId
       : !!input.litterBoxId
   )
-    throw new Error("Choose a valid box or location.");
+    throw new Error("请选择有效的猫砂盆或位置。");
   if (!elimination && input.locationType !== "litter_box")
-    throw new Error("Choose a litter box.");
+    throw new Error("请选择猫砂盆。");
   if (
     !Number.isFinite(Date.parse(input.discoveredAt)) ||
     (input.occurredAt !== null &&
       !Number.isFinite(Date.parse(input.occurredAt)))
   )
-    throw new Error("Choose a valid date and time.");
+    throw new Error("请选择有效的日期和时间。");
   if (!input.occurredAt && !input.timeIsApproximate)
-    throw new Error("Unknown time must be marked approximate.");
+    throw new Error("发生时间未知时，必须标记为估计时间。");
   if (input.occurredAt && input.occurredAt > input.discoveredAt)
-    throw new Error("Occurrence cannot be after discovery.");
+    throw new Error("发生时间不能晚于发现时间。");
   if (Date.parse(input.discoveredAt) > Date.now() + 60000)
-    throw new Error("Time cannot be in the future.");
+    throw new Error("时间不能晚于当前时间。");
   if (
     input.poopConsistency &&
     (input.type !== "poop" ||
       !["hard", "normal", "soft", "diarrhea"].includes(input.poopConsistency))
   )
-    throw new Error("Invalid poop consistency.");
+    throw new Error("请选择有效的便便性状。");
   if (
     input.peeAmount &&
     (input.type !== "pee" ||
       !["small", "medium", "large"].includes(input.peeAmount))
   )
-    throw new Error("Invalid pee amount.");
+    throw new Error("请选择有效的尿量。");
   const needsLitter =
     input.type === "add_litter" || input.type === "replace_litter";
   if (
@@ -68,9 +67,8 @@ export function validateEvent(input: EventInput, litter?: LitterInput) {
       !Number.isFinite(litter.amountLiters) ||
       litter.amountLiters <= 0)
   )
-    throw new Error("Enter a brand, product and positive amount in liters.");
-  if (!needsLitter && litter)
-    throw new Error("Litter details only belong to litter events.");
+    throw new Error("请填写品牌、产品及大于零的用量（升）。");
+  if (!needsLitter && litter) throw new Error("仅猫砂事件可以填写猫砂详情。");
 }
 export async function createEvent(
   db: SQLiteDatabase,
@@ -88,9 +86,7 @@ export async function createEvent(
         input.litterBoxId,
       );
       if (!box?.active)
-        throw new Error(
-          "This box is inactive. Activate it in Boxes before logging.",
-        );
+        throw new Error("此猫砂盆已停用，请先在“猫砂盆”页面启用后再记录。");
     }
     await tx.runAsync(
       "INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",

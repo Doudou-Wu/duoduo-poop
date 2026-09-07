@@ -25,12 +25,20 @@ export default function History() {
         keyExtractor={(e) => e.id}
         ListHeaderComponent={
           <View style={{ gap: 14, marginBottom: 14 }}>
-            <Txt big>Duoduo’s journal</Txt>
+            <Txt big>多多的日记</Txt>
             <View style={s.wrap}>
               {(Object.keys(filters) as (keyof typeof filters)[]).map((key) => (
                 <Button
                   key={key}
-                  title={key}
+                  title={
+                    {
+                      All: "全部",
+                      Pee: "尿尿",
+                      Poop: "便便",
+                      Cleaning: "清洁",
+                      Litter: "猫砂",
+                    }[key]
+                  }
                   selected={filter === key}
                   onPress={() => setFilter(key)}
                 />
@@ -40,7 +48,7 @@ export default function History() {
         }
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         renderItem={({ item }) => <EventCard event={item} boxes={data.boxes} />}
-        ListEmptyComponent={<Txt muted>No events here yet.</Txt>}
+        ListEmptyComponent={<Txt muted>暂无相关记录。</Txt>}
       />
     </View>
   );

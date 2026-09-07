@@ -1,3 +1,5 @@
+import { errorMessage } from "../utils/errors";
+import { consistencyLabels, amountLabels } from "../utils/labels";
 import { useRef, useState } from "react";
 import { Alert, Switch, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -74,10 +76,9 @@ export default function Record() {
       await data.refresh();
       router.back();
     } catch (error) {
-      Alert.alert(
-        "Couldn’t save",
-        error instanceof Error ? error.message : "Please try again.",
-      );
+      Alert.alert("保存失败", errorMessage(error, "请重试。"), [
+        { text: "确定" },
+      ]);
     } finally {
       saving.current = false;
       setBusy(false);
@@ -86,8 +87,8 @@ export default function Record() {
   if (!valid)
     return (
       <Page>
-        <Txt>Choose an event from Home.</Txt>
-        <Button title="Go home" onPress={() => router.replace("/")} />
+        <Txt>请从首页选择要记录的事件。</Txt>
+        <Button title="返回首页" onPress={() => router.replace("/")} />
       </Page>
     );
   return (
@@ -97,12 +98,12 @@ export default function Record() {
       </Txt>
       <Txt muted>
         {elimination
-          ? "Choose a location, then save."
+          ? "选择位置后保存。"
           : litter
-            ? "A little fresh litter."
-            : "Keep Duoduo’s space comfortable."}
+            ? "添些新鲜猫砂。"
+            : "让多多的小空间保持舒适。"}
       </Txt>
-      <Heading>{elimination ? "Where?" : "Which box?"}</Heading>
+      <Heading>{elimination ? "在哪里？" : "哪个猫砂盆？"}</Heading>
       <LocationPicker
         boxes={data.boxes}
         boxId={boxId}
@@ -112,47 +113,47 @@ export default function Record() {
       />
       {litter && (
         <>
-          <Heading>Litter details</Heading>
+          <Heading>猫砂详情</Heading>
           <Field
-            label="Brand"
+            label="品牌"
             value={brand}
             onChangeText={setBrand}
-            placeholder="e.g. Fatto"
+            placeholder="例如：Fatto"
           />
           <Field
-            label="Product"
+            label="产品"
             value={product}
             onChangeText={setProduct}
-            placeholder="e.g. Ultra Brilliant"
+            placeholder="例如：Ultra Brilliant"
           />
           <Field
-            label="Amount (liters)"
+            label="用量（升）"
             value={liters}
             onChangeText={setLiters}
             keyboardType="decimal-pad"
-            placeholder="e.g. 10"
+            placeholder="例如：10"
           />
           <Txt muted>
             {type === "replace_litter"
-              ? "Old litter removed; this starts a fresh total."
-              : "Adds to the current estimated total."}
+              ? "旧猫砂已清空，猫砂总量将重新计算。"
+              : "将计入当前猫砂估算总量。"}
           </Txt>
         </>
       )}
       <Button
-        title={busy ? "Saving…" : "Save event"}
+        title={busy ? "正在保存…" : "保存事件"}
         primary
         disabled={busy || !location}
         onPress={() => void save()}
       />
       <Button
-        title={details ? "Hide details" : "Add details · time, notes & more"}
+        title={details ? "收起详情" : "添加详情 · 时间、备注等"}
         onPress={() => setDetails(!details)}
       />
       {details && (
         <>
           <DateField
-            label={unknown ? "Discovered at" : "Occurred at"}
+            label={unknown ? "发现时间" : "发生时间"}
             value={time}
             onChange={(date) => {
               setTime(date);
@@ -162,11 +163,11 @@ export default function Record() {
           {elimination && (
             <View style={s.row}>
               <View style={{ flex: 1 }}>
-                <Txt>I only know when I discovered it</Txt>
-                <Txt muted>Occurrence time will be unknown.</Txt>
+                <Txt>我只知道发现时间</Txt>
+                <Txt muted>发生时间将标记为未知。</Txt>
               </View>
               <Switch
-                accessibilityLabel="I only know when I discovered it"
+                accessibilityLabel="我只知道发现时间"
                 value={unknown}
                 onValueChange={setUnknown}
               />
@@ -174,13 +175,13 @@ export default function Record() {
           )}
           {type === "poop" && (
             <>
-              <Heading>Consistency · optional</Heading>
+              <Heading>便便性状 · 选填</Heading>
               <View style={s.wrap}>
                 {(["hard", "normal", "soft", "diarrhea"] as const).map(
                   (value) => (
                     <Button
                       key={value}
-                      title={value}
+                      title={consistencyLabels[value]}
                       selected={consistency === value}
                       onPress={() =>
                         setConsistency(consistency === value ? null : value)
@@ -193,12 +194,12 @@ export default function Record() {
           )}
           {type === "pee" && (
             <>
-              <Heading>Amount · optional</Heading>
+              <Heading>尿量 · 选填</Heading>
               <View style={s.wrap}>
                 {(["small", "medium", "large"] as const).map((value) => (
                   <Button
                     key={value}
-                    title={value}
+                    title={amountLabels[value]}
                     selected={amount === value}
                     onPress={() => setAmount(amount === value ? null : value)}
                   />
@@ -207,17 +208,16 @@ export default function Record() {
             </>
           )}
           <Field
-            label="Notes · optional"
+            label="备注 · 选填"
             value={notes}
             onChangeText={setNotes}
             multiline
-            placeholder="Anything worth remembering?"
+            placeholder="有什么想记下的吗？"
           />
         </>
       )}
       <Txt muted>
-        {editedTime ? "Using your selected time." : "Time defaults to now."}{" "}
-        Saved on this device.
+        {editedTime ? "使用你选择的时间。" : "默认使用当前时间。"} 保存在本机。
       </Txt>
     </Page>
   );

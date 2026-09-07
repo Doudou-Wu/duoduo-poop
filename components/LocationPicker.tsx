@@ -27,7 +27,7 @@ export function LocationPicker({
           />
         ))}
       {!boxes.some((b) => b.active) && (
-        <Txt muted>No active boxes. Activate a box in Boxes.</Txt>
+        <Txt muted>暂无启用的猫砂盆，请在“猫砂盆”页面启用。</Txt>
       )}
       {elimination && (
         <View style={s.wrap}>
@@ -35,9 +35,7 @@ export function LocationPicker({
             <View key={loc} style={{ flex: 1, minWidth: 90 }}>
               <Button
                 key={loc}
-                title={
-                  { floor: "Floor", bathtub: "Bathtub", other: "Other" }[loc]
-                }
+                title={{ floor: "地板", bathtub: "浴缸", other: "其他" }[loc]}
                 selected={location === loc}
                 onPress={() => onSelect(loc, null)}
               />

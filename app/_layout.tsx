@@ -15,19 +15,17 @@ export default function Layout() {
             headerTintColor: c.text,
             contentStyle: { backgroundColor: c.bg },
             headerShadowVisible: false,
+            headerBackTitle: "返回",
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
             name="record"
-            options={{ title: "Record event", presentation: "modal" }}
+            options={{ title: "记录事件", presentation: "modal" }}
           />
-          <Stack.Screen name="settings" options={{ title: "Settings" }} />
-          <Stack.Screen
-            name="event/[id]"
-            options={{ title: "Event details" }}
-          />
-          <Stack.Screen name="box/[id]" options={{ title: "Edit box" }} />
+          <Stack.Screen name="settings" options={{ title: "设置" }} />
+          <Stack.Screen name="event/[id]" options={{ title: "事件详情" }} />
+          <Stack.Screen name="box/[id]" options={{ title: "编辑猫砂盆" }} />
         </Stack>
       </DataProvider>
     </SafeAreaProvider>

@@ -16,15 +16,15 @@ export default function Home() {
   const summary = todaySummary(data.events, now);
   return (
     <Page>
-      <Txt big>Duoduo Poop 🐱</Txt>
-      <Txt muted>A little care, every day.</Txt>
+      <Txt big>多多便便 🐱</Txt>
+      <Txt muted>每天多一点关爱。</Txt>
       <Card>
-        <Txt muted>TODAY</Txt>
+        <Txt muted>今天</Txt>
         <View style={{ ...s.row, justifyContent: "space-between" }}>
           {[
-            { label: "Pee", value: summary.pee },
-            { label: "Poop", value: summary.poop },
-            { label: "Outside box", value: summary.outside },
+            { label: "尿尿", value: summary.pee },
+            { label: "便便", value: summary.poop },
+            { label: "盆外", value: summary.outside },
           ].map((x) => (
             <View key={x.label}>
               <Txt big>{x.value}</Txt>
@@ -33,64 +33,64 @@ export default function Home() {
           ))}
         </View>
       </Card>
-      <Heading>Log a moment</Heading>
+      <Heading>记录一下</Heading>
       <View style={s.wrap}>
         <QuickEventButton
-          title="Pee"
+          title="尿尿"
           icon="💧"
           onPress={() => router.push("/record?type=pee")}
         />
         <QuickEventButton
-          title="Poop"
+          title="便便"
           icon="💩"
           onPress={() => router.push("/record?type=poop")}
         />
         <QuickEventButton
-          title="Clean"
+          title="清洁"
           icon="🧹"
           onPress={() =>
-            Alert.alert("Clean a box", "What did you do?", [
+            Alert.alert("清洁猫砂盆", "进行了什么操作？", [
               {
-                text: "Scoop",
+                text: "铲砂",
                 onPress: () => router.push("/record?type=scoop"),
               },
               {
-                text: "Wash box",
+                text: "清洗猫砂盆",
                 onPress: () => router.push("/record?type=wash_box"),
               },
-              { text: "Cancel", style: "cancel" },
+              { text: "取消", style: "cancel" },
             ])
           }
         />
         <QuickEventButton
-          title="Litter"
+          title="猫砂"
           icon="➕"
           onPress={() =>
-            Alert.alert("Litter care", "What did you do?", [
+            Alert.alert("猫砂维护", "进行了什么操作？", [
               {
-                text: "Add litter",
+                text: "添加猫砂",
                 onPress: () => router.push("/record?type=add_litter"),
               },
               {
-                text: "Full replacement",
+                text: "全部换砂",
                 onPress: () => router.push("/record?type=replace_litter"),
               },
-              { text: "Cancel", style: "cancel" },
+              { text: "取消", style: "cancel" },
             ])
           }
         />
       </View>
-      <Heading>Recent activity</Heading>
+      <Heading>最近记录</Heading>
       {data.events.slice(0, 10).map((event) => (
         <EventCard key={event.id} event={event} boxes={data.boxes} />
       ))}
       {!data.events.length && (
         <Card>
-          <Txt>Your journal starts here.</Txt>
-          <Txt muted>Tap Pee or Poop, choose a location, and save.</Txt>
+          <Txt>从这里开始记录。</Txt>
+          <Txt muted>点击尿尿或便便，选择位置后保存。</Txt>
         </Card>
       )}
-      <Button title="Settings" onPress={() => router.push("/settings")} />
+      <Button title="设置" onPress={() => router.push("/settings")} />
     </Page>
   );
 }

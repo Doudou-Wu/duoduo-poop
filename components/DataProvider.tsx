@@ -1,3 +1,4 @@
+import { errorMessage } from "../utils/errors";
 import React, {
   createContext,
   useCallback,
@@ -27,7 +28,7 @@ export function DataProvider({ children }: React.PropsWithChildren) {
       setData({ boxes, events, changes });
       setError("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not open local data.");
+      setError(errorMessage(e, "无法打开本地数据。"));
       throw e;
     }
   }, []);
@@ -41,19 +42,16 @@ export function DataProvider({ children }: React.PropsWithChildren) {
   if (error)
     return (
       <Page>
-        <Txt big>Couldn’t load your data</Txt>
+        <Txt big>无法加载数据</Txt>
         <Txt>{error}</Txt>
-        <Button
-          title="Try again"
-          onPress={() => void refresh().catch(() => {})}
-        />
+        <Button title="重试" onPress={() => void refresh().catch(() => {})} />
       </Page>
     );
   if (!data)
     return (
       <Page>
         <ActivityIndicator />
-        <Txt>Opening Duoduo’s journal…</Txt>
+        <Txt>正在打开多多的日记…</Txt>
       </Page>
     );
   return (

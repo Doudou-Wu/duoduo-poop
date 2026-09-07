@@ -55,7 +55,7 @@ test("Acceptance A–I: seed, log, persist, litter 10+3, wash, insights, reset",
     assert.equal(data.boxes.length, 2);
     assert.deepEqual(
       data.boxes.map((b) => b.name),
-      ["Box 1", "IKEA SAMLA"],
+      ["小猫砂盆", "大猫砂盆"],
     );
     assert.deepEqual(
       [data.boxes[1].lengthCm, data.boxes[1].widthCm, data.boxes[1].heightCm],
@@ -112,7 +112,7 @@ test("Acceptance A–I: seed, log, persist, litter 10+3, wash, insights, reset",
     await deleteEvent(db, replacement);
     assert.equal((await listChanges(db)).length, 0);
     await updateBox(db, { ...box1, name: "Quiet corner", active: false });
-    await assert.rejects(createEvent(db, input("pee", box1.id)), /inactive/);
+    await assert.rejects(createEvent(db, input("pee", box1.id)), /已停用/);
     await migrate(db, randomUUID);
     assert.equal((await listBoxes(db))[0].name, "Quiet corner");
     await resetData(db);
@@ -121,7 +121,7 @@ test("Acceptance A–I: seed, log, persist, litter 10+3, wash, insights, reset",
     assert.equal(data.events.length, 0);
     assert.equal(data.changes.length, 0);
     assert.equal(data.boxes.length, 2);
-    assert.equal(data.boxes[0].name, "Box 1");
+    assert.equal(data.boxes[0].name, "小猫砂盆");
     assert.equal(
       (await db.getFirstAsync<{ user_version: number }>("PRAGMA user_version"))
         ?.user_version,
@@ -176,9 +176,9 @@ test("Atomic litter save rolls back if its second insert fails", async () => {
 test("Validation rejects incomplete or invalid records", () => {
   assert.throws(
     () => validateEvent({ ...input("pee", null), locationType: null }),
-    /location/,
+    /位置/,
   );
-  assert.throws(() => validateEvent(input("wash_box", null)), /box/);
+  assert.throws(() => validateEvent(input("wash_box", null)), /猫砂盆/);
   assert.throws(
     () =>
       validateEvent(input("add_litter", "box"), {
@@ -186,11 +186,11 @@ test("Validation rejects incomplete or invalid records", () => {
         product: "U",
         amountLiters: -1,
       }),
-    /positive/,
+    /大于零/,
   );
   assert.throws(
     () => validateEvent({ ...input("pee", null), occurredAt: null }),
-    /approximate/,
+    /估计时间/,
   );
   assert.doesNotThrow(() =>
     validateEvent({
@@ -267,6 +267,38 @@ test("Backdated replacement, product attribution, age buckets and unknown times"
       insights(data).products.find((x) => x.key === "New · Fresh")?.success,
       1,
     );
+  } finally {
+    await native.closeAsync();
+  }
+});
+
+test("Chinese default names migrate existing records once and preserve edits", async () => {
+  const native = new TestDatabase(":memory:"),
+    db = native as unknown as SQLiteDatabase;
+  try {
+    await migrate(db, randomUUID);
+    const [small, large] = await listBoxes(db);
+    await updateBox(db, { ...small, name: "Box 1" });
+    await updateBox(db, { ...large, name: "IKEA SAMLA" });
+    await createEvent(db, input("poop", large.id));
+    await db.runAsync(
+      "DELETE FROM app_settings WHERE key = ?",
+      "chinese_box_names_v1",
+    );
+    await migrate(db, randomUUID);
+    const boxes = await listBoxes(db);
+    assert.deepEqual(
+      boxes.map((b) => b.name),
+      ["小猫砂盆", "大猫砂盆"],
+    );
+    assert.deepEqual(
+      boxes.map((b) => b.id),
+      [small.id, large.id],
+    );
+    assert.equal((await listEvents(db))[0].litterBoxId, large.id);
+    await updateBox(db, { ...boxes[0], name: "窗边的盆" });
+    await migrate(db, randomUUID);
+    assert.equal((await listBoxes(db))[0].name, "窗边的盆");
   } finally {
     await native.closeAsync();
   }
